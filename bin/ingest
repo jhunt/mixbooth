@@ -1,0 +1,15 @@
+#!/bin/bash
+set -eu
+
+mkdir -p /tmp/ytdl.$$
+pushd /tmp/ytdl.$$
+for url in "$@"; do
+  youtube-dl -x "$url"
+  for file in *; do
+    ffmpeg -i "$file" -vn -c:a libopus "$file.opus"
+    mv "$file.opus" $RADIO_ROOT/
+    echo "$RADIO_ROOT/$file.opus" >> $RADIO_ROOT/playlist.m3u
+  done
+done
+popd
+rm -rf /tmp/ytdl.$$
