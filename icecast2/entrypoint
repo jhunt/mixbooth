@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+if [ -n "${ICECAST2_PASSWORD:-}" ]; then
+	sed -e "s/hackme/$ICECAST2_PASSWORD/g" -i /etc/icecast2/icecast.xml
+fi
+
+exec "$@"

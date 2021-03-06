@@ -1,0 +1,32 @@
+version: '3'
+services:
+  icecast2:
+    image: filefrog/icecast2:latest
+    ports:
+      - '8000:8000'
+    environment:
+      ICECAST2_PASSWORD: oogabooga-pirate-radio000
+
+  source:
+    image: filefrog/liquidsoap:latest
+    command:
+      - |
+        output.icecast(%opus,
+          host = "icecast2",
+          port = 8000,
+          password = "oogabooga-pirate-radio000",
+          mount = "pirate-radio.opus",
+          playlist.safe(reload=120,"/radio/playlist.m3u"))
+
+    volumes:
+      - $PWD/radio:/radio
+
+  web:
+    image: filefrog/mixbooth:latest
+    environment:
+      RADIO_ROOT: /radio
+    ports:
+      - 5000:5000
+
+    volumes:
+      - $PWD/radio:/radio
