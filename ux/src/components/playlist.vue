@@ -1,5 +1,11 @@
 <template>
   <div class="playlist">
+    <section class="play">
+      <h1>Listen</h1>
+      <audio xmlns="http://www.w3.org/1999/xhtml" controls="controls" preload="none" style="width: 100%;">
+        <source type="application/ogg" :src="stream">
+      </audio>
+    </section>
     <section class="add">
       <h1>Add a new track, from YouTube</h1>
       <form @submit.prevent="upload()">
@@ -27,6 +33,9 @@
 
 <script>
 export default {
+  props: {
+    stream: String
+  },
   data() {
     return {
       url:    '',

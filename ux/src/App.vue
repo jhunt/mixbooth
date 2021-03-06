@@ -1,6 +1,6 @@
 <template>
   <div id="wrap"><div id="app">
-    <playlist />
+    <playlist :stream="stream" />
   </div></div>
 </template>
 
@@ -9,7 +9,12 @@ import playlist from './components/playlist.vue'
 
 export default {
   name: 'App',
-  components: {playlist}
+  components: {playlist},
+  computed: {
+    stream() {
+      return `${document.location.protocol}//${document.location.hostname}:5000/pirate-radio.opus`
+    }
+  }
 }
 </script>
 
