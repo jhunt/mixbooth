@@ -2,21 +2,21 @@ package main
 
 import (
 	"bufio"
-	fmt "github.com/jhunt/go-ansi"
-	"net/http"
 	"encoding/json"
-	"os"
-	"regexp"
-	"os/exec"
-	"strings"
+	fmt "github.com/jhunt/go-ansi"
 	"io"
 	"io/ioutil"
+	"net/http"
+	"os"
+	"os/exec"
+	"regexp"
+	"strings"
 
 	"github.com/jhunt/go-log"
 )
 
 type Song struct {
-	Active int `json:"active"`
+	Active int    `json:"active"`
 	File   string `json:"file"`
 }
 
@@ -64,14 +64,14 @@ func WriteM3u(out io.Writer, songs []Song) {
 
 func main() {
 	log.SetupLogging(log.LogConfig{
-		Type: "console",
+		Type:  "console",
 		Level: "info",
 	})
 	log.Infof("mixbooth starting up...")
 
 	Playlist := fmt.Sprintf("%s/playlist.m3u", os.Getenv("RADIO_ROOT"))
 
-	http.HandleFunc("/playlist", func (w http.ResponseWriter, req *http.Request) {
+	http.HandleFunc("/playlist", func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		if req.Method == "GET" {
@@ -117,9 +117,16 @@ func main() {
 				fmt.Fprintf(w, `{"error":"internal error"}`)
 				return
 			}
-			defer f.Close()
 
 			WriteM3u(f, in.Playlist)
+			f.Close()
+			if err := os.Rename(Playlist+"~", Playlist); err != nil {
+				log.Errorf("unable to update playlist %s: %s", Playlist, err)
+				w.WriteHeader(500)
+				fmt.Fprintf(w, `{"error":"internal error"}`)
+				return
+			}
+
 			w.WriteHeader(200)
 			fmt.Fprintf(w, `{"ok":"updated"}`)
 
@@ -129,7 +136,7 @@ func main() {
 		}
 	})
 
-	http.HandleFunc("/upload", func (w http.ResponseWriter, req *http.Request) {
+	http.HandleFunc("/upload", func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		if req.Method == "POST" {

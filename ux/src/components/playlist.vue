@@ -19,7 +19,7 @@
         <li v-for="song in songs" :key="song.file">
           <input type="checkbox" :checked="song.active == 1"
                  @change="song.active = song.active ? 0 : 1; dirty()" />
-          <label>{{ song.file }}</label>
+          <label>{{ pretty(song.file) }}</label>
         </li>
       </ul>
       <button @click="save()" :class="{saving, saved}">
@@ -46,6 +46,10 @@ export default {
     }
   },
   methods: {
+    pretty(file) {
+      return file.replace(/^\/radio\//, '').replace(/-*-[A-Za-z0-9]+\..*?\.opus/, '')
+    },
+
     sync() {
       fetch('/playlist')
         .then(r => r.json())

@@ -12,7 +12,7 @@ export default {
   components: {playlist},
   computed: {
     stream() {
-      return `${document.location.protocol}//${document.location.hostname}:5000/pirate-radio.opus`
+      return `${document.location.protocol}//${document.location.hostname}:8000/pirate-radio.opus`
     }
   }
 }
