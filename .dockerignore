@@ -4,6 +4,6 @@
 !/ux/public
 !/ux/src
 
-!/lib
-!/bin
-!/cpanfile
+!/ingest
+!/go.*
+!/*.go

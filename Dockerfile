@@ -1,26 +1,29 @@
+FROM golang:1.15 AS api
+WORKDIR /app
+COPY go.mod .
+COPY go.sum .
+COPY main.go .
+RUN go build
+
 FROM node:15 AS ux
 WORKDIR /app
-COPY ux /app
+COPY ux .
 RUN yarn install
 RUN yarn build
 
-FROM perl:5.30
+FROM ubuntu:20.04
 RUN apt-get update \
- && apt-get install -y python3-pip \
- && pip3 install youtube-dl
+ && DEBIAN_FRONTEND=noninteractive  apt-get install -y python3 python3-pip ffmpeg \
+ && pip3 install youtube-dl \
+ && apt-get remove -y python3-pip \
+ && apt-get autoremove -y \
+ && rm -rf /var/lib/apt/lists/*
 
-RUN cpanm Carton Starman
+COPY --from=api /app/mixbooth /usr/bin/mixbooth
+COPY --from=ux  /app/dist     /htdocs
+COPY            ingest        /usr/bin
 
-WORKDIR /app
-COPY cpanfile .
-RUN carton install
-
-COPY . .
-RUN carton exec -- perl -I/app/lib -c /app/bin/app.psgi
-
-COPY --from=ux /app/dist /app/dist
 EXPOSE 5000
-ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/app/bin:/usr/local/bin
-CMD ["carton", "exec", "starman", "--port", "5000", "/app/bin/app.psgi"]
 
-RUN apt-get install -y ffmpeg
+ENV HTDOCS_ROOT=/htdocs
+CMD ["mixbooth"]

@@ -2,7 +2,8 @@ IMAGE ?= filefrog/mixbooth
 TAG   ?= latest
 
 default:
-	plackup bin/app.psgi
+	go build .
+	./mixbooth
 
 docker:
 	docker build -t $(IMAGE):$(TAG) .
